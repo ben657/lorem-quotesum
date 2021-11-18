@@ -43,7 +43,7 @@ rl.on('line', chunk => {
 
             db.run(`
                 CREATE TABLE lines (
-                    movie text PRIMARY KEY REFERENCES movies(title),
+                    movie text REFERENCES movies(title),
                     character text,
                     scene text,
                     line text
@@ -54,7 +54,11 @@ rl.on('line', chunk => {
                 INSERT INTO movies VALUES ('Shrek')
             `);
 
-            quotes.forEach(quote => {
+            quotes.forEach(({line, character, scene}) => {
+                db.run(`
+                    INSERT INTO lines (movie, character, scene, line) VALUES (?, ?, ?, ?)
+                `, ['Shrek', character, scene, line]);
+            });
         });
 
         return;
@@ -78,6 +82,8 @@ rl.on('line', chunk => {
 
         case 'SCENE':
             const scene = chunk.trim();
+            if(scene.length < 1) break;
+
             currentScene = scene;
             if(!scenes.includes(scene))
                 scenes.push(scene);

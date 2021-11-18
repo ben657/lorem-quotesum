@@ -6,7 +6,7 @@ public static class MovieService
 
     static MovieService()
     {
-        connection = new SqliteConnection("Data Source=movies.db");
+        connection = new SqliteConnection("Data Source=data.db");
         connection.Open();
     }
 
@@ -26,12 +26,22 @@ public static class MovieService
         var reader = command.ExecuteReader();
         while(reader.Read())
         {
-            Movie movie = new Movie();
-            movie.Title = reader.GetString(0);
-            
-
+            Movie movie = GetMovie(reader.GetString(0));
             movies.Add(movie);
         }
+
+        return movies;
+    }
+
+    public static Movie GetMovie(string movieTitle) 
+    {
+        Movie movie = new Movie();
+        movie.Title = movieTitle;
+        movie.Characters = GetMovieCharacters(movie.Title).ToArray();
+        movie.Scenes = GetMovieScenes(movie.Title).ToArray();
+        movie.Lines = GetMovieLines(movie.Title).ToArray();
+
+        return movie;
     }
 
     public static List<Line> GetMovieLines(string movieTitle)
@@ -89,5 +99,30 @@ public static class MovieService
         }
 
         return characters;
+    }
+
+    public static List<string> GetMovieScenes(string movieTitle) 
+    {
+        List<string> scenes = new List<string>();
+
+        SqliteCommand command = connection.CreateCommand();
+        command.CommandText = 
+        @"
+            SELECT DISTINCT
+                scene
+            FROM
+                lines
+            WHERE
+                movie = @movie
+        ";
+        command.Parameters.AddWithValue("@movie", movieTitle);
+
+        var reader = command.ExecuteReader();
+        while(reader.Read())
+        {
+            scenes.Add(reader.GetString(0));
+        }
+
+        return scenes;
     }
 }
