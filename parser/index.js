@@ -38,15 +38,23 @@ rl.on('line', chunk => {
             db.run(`
                 CREATE TABLE movies (
                     title text PRIMARY KEY
-                );
+                )
+            `);
 
+            db.run(`
                 CREATE TABLE lines (
                     movie text PRIMARY KEY REFERENCES movies(title),
                     character text,
                     scene text,
                     line text
-                );
+                )
             `);
+
+            db.run(`
+                INSERT INTO movies VALUES ('Shrek')
+            `);
+
+            quotes.forEach(quote => {
         });
 
         return;
