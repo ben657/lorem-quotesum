@@ -29,11 +29,11 @@ let lastType = '';
 let line = '';
 rl.on('line', chunk => {
     if(chunk === 'END') {
-        if(fs.existsSync('./data.db')) {
-            fs.unlinkSync('./data.db');
+        if(fs.existsSync('../data.db')) {
+            fs.unlinkSync('../data.db');
         }
 
-        const db = new sqlite3.Database('./data.db');
+        const db = new sqlite3.Database('../data.db');
         db.serialize(() => {
             db.run(`
                 CREATE TABLE movies (
